@@ -46,6 +46,7 @@ from .export.editable.build_hook import write_build_hook
 from .export.sdist import SdistBuilder
 from .export.tags import convert_wheel_tags, get_cross_tags, is_pure
 from .export.wheel import WheelBuilder
+from .hooks import HooksManager
 
 logger = logging.getLogger(__name__)
 
@@ -275,6 +276,14 @@ class _BuildBackend:
         # Configure, build and install the CMake project
         has_build_step = False
         wheel_cfg = _BuildBackend.get_wheel_config(self.plat, cfg)
+        hooks = HooksManager(paths,
+                             cfg,
+                             self.plat,
+                             pkg_info,
+                             self.runner,
+                             wheel_cfg=wheel_cfg)
+        hooks.run_prebuild_wheel()
+
         builders = [(idx, cmkcfg.get_builder(paths.source_dir,
                                              paths.staging_dir,
                                              cfg.cross,
@@ -301,6 +310,8 @@ class _BuildBackend:
         wheel = self.create_wheel(self.plat, paths, cfg, has_build_step, pkg_info)
         for idx, builder in builders:
             wheel = builder.postbuild(wheel)
+        # Post wheel creation
+        hooks.run_postbuild_wheel(wheel)
         return str(wheel.relative_to(paths.wheel_dir))
 
     @staticmethod

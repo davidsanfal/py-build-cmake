@@ -105,6 +105,7 @@ class Config:
     stubgen: dict[str, Any] | None = field(default=None)
     cross: dict[str, Any] | None = field(default=None)
     dynamic: dict[str, Any] = field(default_factory=dict)
+    hooks: dict[str, dict[str, Any]] | None = field(default=None)
 
     @property
     def referenced_files(self) -> list[Path]:

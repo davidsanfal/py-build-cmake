@@ -358,12 +358,19 @@ def process_config(  # noqa: PLR0915
     if pbc_value_ref.is_value_set(s):
         cfg.stubgen = pbc_value_ref.get_value(s)
 
+    # Store the hooks configuration
+    cfg.hooks = {
+        os: cast(Dict[str, Any], pbc_value_ref.get_value(ConfPath((os, "hooks"))))
+        for os in oses_cross
+        if pbc_value_ref.is_value_set(ConfPath((os, "hooks")))
+    }
+
     # Store the cross compilation configuration
     s = "cross"
     if pbc_value_ref.is_value_set(s):
         cfg.cross = copy(cast(Optional[Dict[str, Any]], pbc_value_ref.get_value(s)))
         if cfg.cross is not None:
-            for k in ("conan", "cmake", "wheel", "sdist", "editable"):
+            for k in ("conan", "cmake", "wheel", "sdist", "editable", "hooks"):
                 cfg.cross.pop(k, None)
 
     # Check for incompatible options

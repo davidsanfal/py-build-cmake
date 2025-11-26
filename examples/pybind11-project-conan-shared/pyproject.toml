@@ -43,3 +43,6 @@ find_python3_build_artifacts_prefix = "_HOST"
 generator = "Ninja Multi-Config"
 [tool.py-build-cmake.mac.conan.cmake]
 generator = "Ninja Multi-Config"
+
+# [tool.py-build-cmake.mac.hooks.wheel]
+# postbuild = ["./conan_delocate.py"]

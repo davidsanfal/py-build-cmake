@@ -726,6 +726,35 @@ def get_options(project_path: Path | PurePosixPath, *, test: bool = False):
                          "on macOS, for example."),
     ])  # fmt: skip
 
+    # [tool.py-build-cmake.hooks]
+    hooks = pbc.insert(
+        ConfigOption("hooks",
+                     "Hooks.",
+                     default=DefaultValueValue({}),
+    ))  # fmt: skip
+    hooks_pth = ConfPath.from_string("pyproject.toml/tool/py-build-cmake/hooks")
+    hooks.insert_multiple([
+        ListOfStrConfigOption('prebuild',
+                              "prebuild hooks",
+                              default=None),
+        ListOfStrConfigOption("postbuild",
+                              "postbuild hooks",
+                              default=None),
+    ])  # fmt: skip
+    hooks_wheel = hooks.insert(
+        ConfigOption("wheel",
+                     "Defines options for wheel hooks.",
+                     default=DefaultValueValue({})),
+    )  # fmt: skip
+    hooks_wheel.insert_multiple([
+        ListOfStrConfigOption('prebuild',
+                              "prebuild hooks",
+                              default=None),
+        ListOfStrConfigOption("postbuild",
+                              "postbuild hooks",
+                              default=None),
+    ])  # fmt: skip
+
     # [tool.py-build-cmake.{linux,windows,mac,pyodide}]
     for system, system_name in (
         ("linux", "Linux"),
@@ -759,6 +788,10 @@ def get_options(project_path: Path | PurePosixPath, *, test: bool = False):
             ConfigOption("wheel",
                          f"{system_name}-specific Wheel options.",
                          inherit_from=wheel_pth,
+                         create_if_inheritance_target_exists=True),
+            ConfigOption("hooks",
+                         f"{system_name}-specific Hooks options.",
+                         inherit_from=hooks_pth,
                          create_if_inheritance_target_exists=True),
         ])  # fmt: skip
 
